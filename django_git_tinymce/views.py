@@ -28,9 +28,9 @@ class RepoDetail(DetailView):
         context = super(RepoDetail, self).get_context_data(**kwargs)
         repo = Repo.objects.get(
             Q(user=User.objects.get(
-            username=self.kwargs.get(
-                'user', '')).pk) & Q(
-            slug=self.kwargs.get('slug', '')))
+                username=self.kwargs.get(
+                    'user', '')).pk) & Q(
+                slug=self.kwargs.get('slug', '')))
         context['repo'] = repo
         return context
 

@@ -16,7 +16,7 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
-from django_git_tinymce.views import RepoList, RepoDetail, DocumentList, DocumentCreate, DocumentUpdate, DocumentDelete
+from django_git_tinymce.views import RepoDetail, DocumentList, DocumentCreate, DocumentUpdate, DocumentDelete
 from django.views import static
 from django.views.generic import TemplateView
 
@@ -31,5 +31,5 @@ urlpatterns = [
     url(r'^newdoc/(?P<path>.*)$', DocumentCreate.as_view(), name='docs-create'),
     url(r'^editdoc/(?P<path>.*)$', DocumentUpdate.as_view(), name='docs-update'),
     url(r'^deldoc/(?P<path>.*)$', DocumentDelete.as_view(), name='docs-delete'),
-    # url(r'^(?P<path>.*)$', static.serve, {'document_root': settings.STATIC_URL + 'git',}),
+    url(r'^(?P<path>.*)$', static.serve, {'document_root': settings.STATIC_URL + 'git',}),
 ]

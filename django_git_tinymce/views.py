@@ -10,7 +10,6 @@ from django_git_tinymce.forms import DocumentForm
 from django.contrib.auth.models import User
 
 
-
 class RepoList(SearchableListMixin, SortableListMixin, ListView):
     sort_fields_aliases = [('name', 'by_name'), ('id', 'by_id'), ('owners', 'by_owners')]
     search_fields = [('application__name', 'iexact')]
@@ -27,8 +26,10 @@ class RepoDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(RepoDetail, self).get_context_data(**kwargs)
-        repo = Repo.objects.get(Q(user=User.objects.get(
-            username=self.kwargs.get('user', '')).pk) & Q(
+        repo = Repo.objects.get(
+            Q(user=User.objects.get(
+            username=self.kwargs.get(
+                'user', '')).pk) & Q(
             slug=self.kwargs.get('slug', '')))
         context['repo'] = repo
         return context

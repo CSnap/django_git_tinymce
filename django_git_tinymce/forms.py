@@ -8,4 +8,3 @@ class DocumentForm(ModelForm):
         model = Document
         exclude = ('owners',)
 
-

@@ -18,10 +18,22 @@ from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
+from rest_framework import routers
 
 from dashboard.views import DashboardView, DashboardAllRepoIndexView
 # from gitusers.views import IndexView
 
+from tags import viewsets as tags_viewsets
+from repos import viewsets as repos_viewsets
+from gitusers import viewsets as gitusers_viewsets
+from analytics import viewsets as analytics_viewsets
+
+
+router = routers.DefaultRouter()
+router.register(r'tag', tags_viewsets.TagViewSet, base_name='api-tag')
+router.register(r'repository', repos_viewsets.RepositoryViewSet, base_name='api-repository')
+router.register(r'owner', gitusers_viewsets.OwnerViewSet, base_name='api-owner')
+router.register(r'taganalytics', analytics_viewsets.TagAnalyticsViewSet, base_name='api-taganalytics')
 
 urlpatterns = [
     # url(r'^$', DashboardView.as_view(), name='index'),
@@ -34,6 +46,9 @@ urlpatterns = [
 
     url(r'^tags/', include('tags.urls', namespace='tags')),
     url(r'^(?P<username>[\w.+-]+)/', include('gitusers.urls')),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^api/v1/', include(router.urls, namespace='apiv1')),
+    # url(r'^api/', include(router.urls)),
 
 
 ]

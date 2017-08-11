@@ -14,3 +14,4 @@ from . import serializers
 class OwnerViewSet(viewsets.ModelViewSet):
     queryset = models.Owner.objects.all()
     serializer_class = serializers.Owner
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)

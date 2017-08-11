@@ -41,14 +41,11 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^login/$', auth_views.LoginView.as_view(), name='login'),
     url(r'^logout/$', auth_views.LogoutView.as_view(), name='logout'),
-
     url(r'^tinymce/', include('tinymce.urls')),
-
+    url(r'^api/v1/', include(router.urls, namespace='apiv1')),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^tags/', include('tags.urls', namespace='tags')),
     url(r'^(?P<username>[\w.+-]+)/', include('gitusers.urls')),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^api/v1/', include(router.urls, namespace='apiv1')),
-    # url(r'^api/', include(router.urls)),
 
 
 ]

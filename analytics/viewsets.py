@@ -14,3 +14,4 @@ from . import serializers
 class TagAnalyticsViewSet(viewsets.ModelViewSet):
     queryset = models.TagAnalytics.objects.all()
     serializer_class = serializers.TagAnalytics
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)

@@ -14,3 +14,4 @@ from . import serializers
 class RepositoryViewSet(viewsets.ModelViewSet):
     queryset = models.Repository.objects.all()
     serializer_class = serializers.Repository
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)

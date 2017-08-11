@@ -6,10 +6,12 @@
 
 {% block content %}
 
-<h1>Edit {{ filename }} File</h1>
+
+<h1>Create File</h1>
 
 {% if error_message %}
 	{{ error_message }}
+	<p><a href="{% url 'gitusers:create_file' username=object.owner slug=object.slug %}">Go back</a></p>
 	
 {% else %}
 	<form action="" method="post">

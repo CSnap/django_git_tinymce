@@ -66,7 +66,7 @@ class FilesView(APIView):
             time = json.dumps(datetime.datetime.fromtimestamp(commit.commit_time), default=date_handler)
 
             main_list = {
-                        'files':tuplet,
+                        'files': tuplet,
                         'hex': commit.hex,
                         'message': commit.message,
                         'author': commit.author.name,
@@ -74,21 +74,21 @@ class FilesView(APIView):
                         'time': time,
                         'branches': list(this_repo.branches),
                         'is_owner': is_owner,
-                        'is_empty':empty
+                        'is_empty': empty
             }
 
         except:
             # no files, no initial commit so no head hex
             main_list = {
-                        'files':tuplet,
+                        'files': tuplet,
                         'hex': None,
                         'message': None,
                         'author': None,
                         'committer': None,
                         'time': None,
-                        'branches': None,
+                        'branches': [],
                         'is_owner': is_owner,
-                        'is_empty':empty
+                        'is_empty': empty
             }
 
         return Response(main_list, status=status.HTTP_200_OK)

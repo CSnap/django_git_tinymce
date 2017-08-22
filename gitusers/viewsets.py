@@ -55,32 +55,36 @@ class FilesView(APIView):
             return Response(tuplet, status=status.HTTP_200_OK)
         for entry in tree:
             tuplet.append({'name': entry.name, 'id': entry.id.hex, 'type': entry.type, 'filemode': entry.filemode})
-        main_list = []
-        main_list.append({'files':tuplet})
 
-        third_tuplet = []
-        third_tuplet.append({'hex': commit.hex})
-        third_tuplet.append({'message': commit.message})
-        third_tuplet.append({'author': commit.author.name})
-        third_tuplet.append({'committer': commit.committer.name})
         date_handler = lambda obj: (
             obj.isoformat()
             if isinstance(obj, (datetime.datetime, datetime.date))
             else None
         )
         time = json.dumps(datetime.datetime.fromtimestamp(commit.commit_time), default=date_handler)
-        third_tuplet.append({'time': time})
-        main_list.append({'last_commit': third_tuplet})
 
-
-        main_list.append({'branches': list(this_repo.branches)})
 
         user = request.user
         is_owner = True if specific_repo.owner == user else False
-        main_list.append({'is_owner': is_owner})
         empty = False
         if this_repo.is_empty:
             empty = True
-        main_list.append({'empty':empty})
-        final_tuple = tuple(main_list)
-        return Response(final_tuple, status=status.HTTP_200_OK)
+
+
+        main_list = {
+                    'files':tuplet,
+                    'hex': commit.hex,
+                    'message': commit.message,
+                    'author': commit.author.name,
+                    'committer': commit.committer.name,
+                    'time': time,
+                    'branches': list(this_repo.branches),
+                    'is_owner': is_owner,
+                    'is_empty':empty
+
+
+
+
+        }
+
+        return Response(main_list, status=status.HTTP_200_OK)

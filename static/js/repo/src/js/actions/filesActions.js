@@ -8,6 +8,9 @@ export function fetchFiles() {
     axios.get(`/api/v1/files/${window.props.repo_id}`)
       .then((response) => {
         console.log('data.files', response.data)
+        // if response.data.files == undefined {
+        //   response.data.files = []
+        // }
         dispatch({type: "FETCH_FILES_FULFILLED", payload: response.data.files})
         dispatch({type: "FETCH_IS_AUTHOR_FULFILLED", payload: response.data.is_owner})
       })

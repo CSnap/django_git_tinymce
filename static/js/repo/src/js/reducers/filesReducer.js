@@ -3,11 +3,16 @@ export default function reducer(state={
     fetching: false,
     fetched: false,
     error: null,
-    is_owner: null
+    is_owner: null,
+    message: null,
+    committer: null,
+    hex: null,
+    time: null,
   }, action) {
 
     switch (action.type) {
       case "FETCH_FILES": {
+
         return {...state, fetching: true}
       }
       case "FETCH_FILES_REJECTED": {
@@ -25,6 +30,43 @@ export default function reducer(state={
         return {
           ...state,
           is_owner: action.payload
+        }
+      }
+      case "FETCH_BRANCHES_FULFILLED": {
+        return {
+          ...state,
+          branches: action.payload
+        }
+      }
+      case "FETCH_MESSAGE_FULFILLED": {
+        return {
+          ...state,
+          message: action.payload
+        }
+      }
+      case "FETCH_COMMITTER_FULFILLED": {
+        return {
+          ...state,
+          committer: action.payload
+        }
+      }
+      case "FETCH_HEX_FULFILLED": {
+        return {
+          ...state,
+          hex: action.payload
+        }
+      }
+      case "FETCH_TIME_FULFILLED": {
+        if (action.payload == null) {
+          return {
+            ...state,
+            time: "\"2017-42-42T26:00:00\""
+          }
+        } else {
+          return {
+            ...state,
+            time: action.payload
+          }
         }
       }
       // case "ADD_TWEET": {

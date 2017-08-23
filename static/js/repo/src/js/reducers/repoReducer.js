@@ -7,6 +7,7 @@ export default function reducer(state={
 
     switch (action.type) {
       case "FETCH_REPO": {
+
         return {...state, fetching: true}
       }
       case "FETCH_REPO_REJECTED": {

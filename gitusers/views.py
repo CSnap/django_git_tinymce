@@ -420,3 +420,53 @@ class BlobRawView(View):
 
 		except OSError:
 			raise Http404("Failed to open or read file")
+
+# Not Working:
+class BlobDeleteView(DeleteView):
+
+	template_name = 'repo/delete.html'
+	success_url = reverse_lazy('index')
+
+	def get(self, request, **kwargs):
+
+		filename = self.kwargs.get('filename')
+
+		if self.kwargs.get('extension'):
+			filename += self.kwargs.get('extension')
+
+		repo_obj = None
+
+		try:
+			repo_obj = Repository.objects.get(
+				owner__username=self.kwargs.get('username'),
+				slug=self.kwargs['slug']
+			)
+			repo = pygit2.Repository(repo_obj.get_repo_path())
+
+			if repo.is_empty:
+				print('asdfasdfasdfasfd')
+				raise Http404("The repository is empty")
+
+		except:
+			raise Http404("Failed to open repository")
+
+		try:
+			commit = repo.revparse_single('HEAD')
+			tree = commit.tree
+			blob_id = find_file_oid_in_tree(filename, tree)
+
+			file_name = str(filename)
+			repo_path = repo_obj.get_repo_path()
+			print(file_name)
+			# not working
+			# os.remove(os.path.join(repo.workdir) +  file_name)
+			commit_message = str(filename) + ' deleted'
+			create_commit(self.request.user, repo, commit_message, filename)
+
+			return HttpResponseRedirect(reverse(
+				'gitusers:repo_detail',
+				args=(request.user.username, repo_obj.slug))
+			)
+
+		except OSError:
+			raise Http404("Failed to open or read file")

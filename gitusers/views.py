@@ -450,34 +450,17 @@ class BlobDeleteView(DeleteView):
 		except:
 			raise Http404("Failed to open repository")
 
-
 		commit = repo.revparse_single('HEAD')
 		tree = commit.tree
 		blob_id = find_file_oid_in_tree(filename, tree)
-
 		file_name = str(filename)
 		repo_path = repo_obj.get_repo_path()
-		print('file_name', file_name)
-		# not working
-		# index = repo.index
-		# index.read()
-		# index.remove(file_name)
-		# index.write()
-
-
-
-		print('os.path.join(repo.workdir', os.path.join(repo.workdir))
 		commit_message = str(filename) + ' deleted'
 		delete_commit(self.request.user, repo, commit_message, filename)
-		os.remove(os.path.join(repo.workdir) +  file_name)
-		#os.remove(file_name)
-
-		# dir_path = os.path.dirname(os.path.realpath(__file__))
-		# print(dir_path)
-		# print(dir_path + "/" + repo_obj.owner.username + "/" +  repo_obj.slug + "/" + file_name)
-		# os.remove(dir_path + "/" + repo_obj.owner.username + "/" +  repo_obj.slug + "/" + file_name)
-
-
+		try:
+			os.remove(os.path.join(repo.workdir) +  file_name)
+		except OSError:
+			pass
 		return HttpResponseRedirect(reverse(
 			'gitusers:repo_detail',
 			args=(request.user.username, repo_obj.slug))

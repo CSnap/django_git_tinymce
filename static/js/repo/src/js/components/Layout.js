@@ -106,7 +106,7 @@ export default class Layout extends React.Component {
           <Branches branches={files.branches}/>
 
           <div class="panel panel-success">
-            {(files.committer) ? <div class="panel-heading">Latest commit message by <a href={`/${files.committer}`}>{files.committer}</a>: <a href={`commit/${files.hex}`}>"{files.message}" <font style={{color: '#999'}}><i>({this.timeFormat(files.time)})</i></font></a></div> : <div class="panel-heading">No Files Yet</div> }
+            {(files.committer) ? <div class="panel-heading">Last commit message by <a href={`/${files.committer}`}>{files.committer}</a>: <a href={`commit/${files.hex}`}>{files.message} <font style={{color: '#999'}}><i>({this.timeFormat(files.time)})</i></font></a></div> : <div class="panel-heading">No Files Yet</div> }
             <table class="table">
               <thead>
                 <tr>
@@ -120,7 +120,7 @@ export default class Layout extends React.Component {
               {this.props.files.files.map((file) => {
                 const icon = this.getIcon(file.type)
                 const editLink = (files.is_owner) ? <a href={`blob/${file.name}/edit`} style={{fontSize: '.75em', color: '#999'}}>edit</a> : null
-                return <tr key={file.id}><th scope="row">{icon} <a href={`blob/${file.name}`}>{ file.name }</a> &nbsp;{editLink}</th><td><a href={`blob/${file.name}/delete`}><font style={{fontSize: '.75em', color: '#f33'}}>delete (not working)</font></a></td><td><a href={`commit/${file.id}`}>{file.id}</a></td></tr>
+                return <tr key={file.id}><th scope="row">{icon} <a href={`blob/${file.name}`}>{ file.name }</a> &nbsp;{editLink}</th><td><a href={`blob/${file.name}/delete`}><font style={{fontSize: '.75em', color: '#f33'}}>delete</font></a></td><td><a href={`commit/${file.id}`}>{file.id}</a></td></tr>
               })}
               </tbody>
             </table>

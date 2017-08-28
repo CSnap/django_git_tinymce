@@ -317,7 +317,7 @@ class RepositoryCreateFileView(OwnerRequiredMixin, FormView):
 		#c = git_repo.create_commit('HEAD', s,s, commit_message, t, [git_repo.head.target])
 
 
-		create_commit(self.request.user, git_repo, commit_message, path.join( dirname, filename2),)
+		create_commit(self.request.user, git_repo, commit_message, path.join( dirname, filename2))
 
 		return super(RepositoryCreateFileView, self).form_valid(form)
 

@@ -7,6 +7,13 @@ import { fetchFiles } from "../actions/filesActions"
 //import { fetchTags } from "../actions/tagsActions"
 
 import Branches from "./Branches"
+import Dropzone from 'react-dropzone'
+import request from 'superagent';
+
+require('superagent-django-csrf');
+
+
+
 
 
 @connect((store) => {
@@ -37,6 +44,23 @@ export default class Layout extends React.Component {
     timeStr = timeStr.substring(0, timeStr.length - 1)
     timeStr = timeStr.replace(/T/g , " ");
     return timeStr
+  }
+
+
+
+  onDrop(files) {
+    var file = new FormData();
+    file.append('name',files[0])
+
+
+
+
+    var req=request
+              .post(`/api/v1/files/${window.props.repo_id}`)
+              .send(file);
+    req.end(function(err,response){
+        console.log("upload done!!!!!");
+    });
   }
 
 
@@ -132,7 +156,9 @@ export default class Layout extends React.Component {
       </div>
       <div className="row">
         <div className="col-md-12">
-
+          <Dropzone onDrop={this.onDrop.bind(this)}>
+            <p>Try dropping some files here, or click to select files to upload.</p>
+          </Dropzone>
 
 
 

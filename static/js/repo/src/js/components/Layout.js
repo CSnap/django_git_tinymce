@@ -218,7 +218,7 @@ export default class Layout extends React.Component {
                 onDrop={this.onDrop.bind(this)}
                 className="dropzone"
                 >
-                <p>&nbsp;&nbsp;<b>Upload File:</b> To upload a file, drag & drop file anywhere above. Or click this box to select file to upload.</p>
+                <p>&nbsp;&nbsp;<b>Upload Files:</b> To upload files, drag & drop files anywhere above. Or click this box to select files to upload.</p>
               </Dropzone>
             </div>
             <aside>

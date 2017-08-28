@@ -23,7 +23,6 @@ from . import models
 from . import serializers
 from os import path
 import os
-import urllib
 
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
@@ -115,27 +114,11 @@ class FilesView(APIView):
         print(this_repo)
 
         data = request.data
-        #response = urllib.request.urlopen(request)
-        #str_response = response.readall().decode('utf-8')
-        #obj = json.loads(str_response)
-
-        print(data)
         data_name = str(data['name'])
         data2 = data['name']
-        # print(data.name)
-        # save the data as a blob
-        #with open(data, 'rb') as f:
-        #    data2 = f.read()
-        # with open(data_name, 'wb') as f:
-        #     f.write(obj)
         path = default_storage.save(os.path.join(specific_repo.get_repo_path(), data_name), ContentFile(data2.read()))
         print('path', path)
         tmp_file = os.path.join(specific_repo.get_repo_path(), path)
-
-        file = open(data_name, 'w')
-        file.write(path)
-        file.close()
-
 
         b = this_repo.create_blob_fromworkdir(data_name)
         bld = this_repo.TreeBuilder()
@@ -156,4 +139,4 @@ class FilesView(APIView):
         return HttpResponseRedirect(reverse(
 			'gitusers:repo_detail',
 			args=(request.user.username, specific_repo.slug))
-		)
+        )

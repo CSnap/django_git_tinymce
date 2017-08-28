@@ -138,7 +138,7 @@ class FilesView(APIView):
     		# s = pygit2.Signature(self.request.user.username, email, int(time()), 0)
     		#s = pygit2.Signature('Alice Author', 'alice@authors.tld', int(time()), 0)
     		#c = this_repo.create_commit('HEAD', s,s, commit_message, t, [this_repo.head.target])
-            commit_message = "Uploaded file"
+            commit_message = "Uploaded file " + data_name
 
             create_commit(self.request.user, this_repo, commit_message, data_name)
         return HttpResponseRedirect(reverse(

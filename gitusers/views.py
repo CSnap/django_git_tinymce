@@ -280,18 +280,34 @@ class RepositoryCreateFileView(OwnerRequiredMixin, FormView):
 			if find_file_oid_in_tree(filename, tree) != 404:
 				form.add_error(None, "File named {} already exists".format(filename))
 				return self.form_invalid(form)
+		dirname = ""
+		filename2 = filename
+		if "/" in filename:
+			# import re
+			# pattern = re.compile(r"^(.+)/([^/]+)$")
+			# matches = pattern.search(filename)
+			# print('matches', matches)
+			dirname, filename2 = os.path.split(filename)
 
-		file = open(path.join(repo.get_repo_path(), filename), 'w')
+		if not os.path.exists(path.join(repo.get_repo_path(), dirname, filename2)):
+		    try:
+		        os.makedirs(os.path.dirname(path.join(repo.get_repo_path(), dirname, filename2),))
+		    except OSError as exc: # Guard against race condition
+		        if exc.errno != errno.EEXIST:
+		            raise
+
+		print(filename2)
+		file = open(path.join(repo.get_repo_path(), dirname, filename2), 'w')
 		file.write(filecontent)
 		file.close()
 
 
-		b = git_repo.create_blob_fromworkdir(filename)
+		b = git_repo.create_blob_fromworkdir(path.join(dirname, filename2))
 		bld = git_repo.TreeBuilder()
-		bld.insert(filename, b, os.stat(os.path.join(repo.get_repo_path(), filename)).st_mode )
+		bld.insert(filename2, b, os.stat(os.path.join(repo.get_repo_path(), dirname, filename2)).st_mode )
 		t = bld.write()
 		git_repo.index.read()
-		git_repo.index.add(filename)
+		git_repo.index.add(path.join( dirname, filename2))
 		git_repo.index.write()
 		email = "nonegiven@nonegiven.com"
 		if self.request.user.email:
@@ -301,7 +317,7 @@ class RepositoryCreateFileView(OwnerRequiredMixin, FormView):
 		#c = git_repo.create_commit('HEAD', s,s, commit_message, t, [git_repo.head.target])
 
 
-		create_commit(self.request.user, git_repo, commit_message, filename)
+		create_commit(self.request.user, git_repo, commit_message, path.join( dirname, filename2),)
 
 		return super(RepositoryCreateFileView, self).form_valid(form)
 

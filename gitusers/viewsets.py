@@ -114,6 +114,7 @@ class FilesView(APIView):
         print(this_repo)
 
         data = request.data
+        print(data)
         data_name = str(data['name'])
         data2 = data['name']
         path = default_storage.save(os.path.join(specific_repo.get_repo_path(), data_name), ContentFile(data2.read()))

@@ -23,6 +23,15 @@ require('superagent-django-csrf');
   };
 })
 export default class Layout extends React.Component {
+  constructor() {
+      super()
+      this.state = {
+        accept: '',
+        files: [],
+        dropzoneActive: false
+      }
+    }
+
   componentDidMount() {
     //this.props.dispatch(fetchUser())
     this.props.dispatch(fetchRepo())
@@ -49,23 +58,63 @@ export default class Layout extends React.Component {
 
 
   onDrop(files) {
+    this.setState({
+      files: files,
+      dropzoneActive: false
+    });
     var file = new FormData();
-    file.append('name',files[0])
+
+    files.forEach((dropped_file) => {
+      var req=request
+                .post(`/api/v1/files/${window.props.repo_id}`)
+
+      req.attach('name', dropped_file);
+      //file.append('name',dropped_file)
+      req.send
+      req.end(function(err,response){
+          console.log("upload done!!!!!");
+      });
+
+    })
 
 
 
 
-    var req=request
-              .post(`/api/v1/files/${window.props.repo_id}`)
-              .send(file);
-    req.end(function(err,response){
-        console.log("upload done!!!!!");
+
+
+  }
+  onDragEnter() {
+    this.setState({
+      dropzoneActive: true
+    });
+  }
+
+  onDragLeave() {
+    this.setState({
+      dropzoneActive: false
+    });
+  }
+  applyMimeTypes(event) {
+    this.setState({
+      accept: event.target.value
     });
   }
 
 
   render() {
     const { repo, files, is_author } = this.props;
+    const { accept, dropzoneActive } = this.state;
+    const overlayStyle = {
+      position: 'absolute',
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+      padding: '2.5em 0',
+      background: 'rgba(0,0,0,0.5)',
+      textAlign: 'center',
+      color: '#fff'
+    };
 
     console.log('this.props.files', this.props.files)
     console.log('files', files)
@@ -79,24 +128,20 @@ export default class Layout extends React.Component {
     }
     if (!this.props.files.time) {
             return <p>Loading...</p>
-            // <div className="row">
-            //   <div className="col-md-12">
-            //     <p>
-            //       <h2 className="repo-header"><a href={`/${window.props.repo_owner}`}>{window.props.repo_owner}</a> / <a href={`/${window.props.repo_owner}/${window.props.repo_name}`}>{window.props.repo_name}</a></h2>
-            //     </p>
-            //
-            //     <p>
-            //       <h4 className="repo-header">{repo.description} {editShow}</h4>
-            //     </p>
-            //     <p><Branches branches={files.branches}/></p>
-            //   </div>
-            // </div>
     }
 
 
 
 
     return <div>
+      <Dropzone
+        disableClick
+        style={{}}
+        accept={accept}
+        onDrop={this.onDrop.bind(this)}
+        onDragEnter={this.onDragEnter.bind(this)}
+        onDragLeave={this.onDragLeave.bind(this)}
+      >
       <div className="row">
         <div className="col-md-6 col-xs-8">
           <p>
@@ -156,15 +201,39 @@ export default class Layout extends React.Component {
       </div>
       <div className="row">
         <div className="col-md-12">
-          <Dropzone onDrop={this.onDrop.bind(this)}>
-            <p>Try dropping some files here, or click to select files to upload.</p>
-          </Dropzone>
+          { files.is_owner &&
+            <div>
+          <section>
+            <div className="dropzone">
+              <Dropzone
+                onDrop={this.onDrop.bind(this)}
+                className="dropzone"
+                >
+                <p>&nbsp;&nbsp;<b>Upload File:</b> To upload a file, drag & drop file anywhere above. Or click this box to select file to upload.</p>
+              </Dropzone>
+            </div>
+            <aside>
+              { this.state.files[0] &&
+                <div>
+                  <h2>Dropped files</h2>
+                  <ul>
+                    {
+                      this.state.files.map(f => <li key={f.name}>{f.name} - {f.size} bytes</li>)
+                    }
+                  </ul>
+                </div>
+              }
+            </aside>
+          </section>
+        </div>
+          }
+
 
 
 
         </div>
       </div>
-
+      </Dropzone>
     </div>
   }
 }

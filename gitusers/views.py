@@ -14,7 +14,7 @@ from django.views.generic.edit import (
 from django.views.generic.list import ListView
 from django.urls import reverse, reverse_lazy
 
-from .utils import find_file_oid_in_tree, create_commit, delete_commit
+from .utils import find_file_oid_in_tree, create_commit, delete_commit, find_file_oid_in_tree_using_index
 from django_git.mixins import OwnerRequiredMixin
 from repos.forms import (
 	RepositoryModelForm,
@@ -135,10 +135,14 @@ class ReduxRepositoryDetailView(DetailView):
 	template_name = 'repo/redux_repo.html'
 	component = 'repo/src/client.min.js'
 
+
 	def get(self, request, slug, username):
     	# gets passed to react via window.props
 		owner_name = self.kwargs['username']
 		repo_name = self.kwargs['slug']
+		directory = ""
+		if 'directories' in self.kwargs:
+			directory = self.kwargs['directories']
 		user = User.objects.get(username=owner_name)
 		repo = Repository.objects.get(owner=user.id,name__iexact=repo_name)
 
@@ -147,6 +151,41 @@ class ReduxRepositoryDetailView(DetailView):
 					'repo_owner': owner_name,
 					'repo_owner_id' : user.id,
 					'repo_id': repo.id,
+					'directory': directory
+
+
+		}
+
+		context = {
+
+        	'component': self.component,
+        	'props': props,
+		}
+
+		return render(request, self.template_name, context)
+
+class ReduxRepositoryFolderDetailView(DetailView):
+	model = Repository
+	template_name = 'repo/redux_repo.html'
+	component = 'repo/src/client.min.js'
+
+
+	def get(self, request, slug, username, directories):
+    	# gets passed to react via window.props
+		owner_name = self.kwargs['username']
+		repo_name = self.kwargs['slug']
+		directory = ""
+		if 'directories' in self.kwargs:
+			directory = self.kwargs['directories']
+		user = User.objects.get(username=owner_name)
+		repo = Repository.objects.get(owner=user.id,name__iexact=repo_name)
+
+		props = {
+					'repo_name': repo_name,
+					'repo_owner': owner_name,
+					'repo_owner_id' : user.id,
+					'repo_id': repo.id,
+					'directory': directory
 
 
 		}
@@ -282,6 +321,7 @@ class RepositoryCreateFileView(OwnerRequiredMixin, FormView):
 				return self.form_invalid(form)
 		dirname = ""
 		filename2 = filename
+
 		if "/" in filename:
 			# import re
 			# pattern = re.compile(r"^(.+)/([^/]+)$")
@@ -289,9 +329,9 @@ class RepositoryCreateFileView(OwnerRequiredMixin, FormView):
 			# print('matches', matches)
 			dirname, filename2 = os.path.split(filename)
 
-		if not os.path.exists(path.join(repo.get_repo_path(), dirname, filename2)):
+		if not os.path.exists(path.join(repo.get_repo_path(), dirname)):
 		    try:
-		        os.makedirs(os.path.dirname(path.join(repo.get_repo_path(), dirname, filename2),))
+		        os.makedirs(os.path.dirname(path.join(repo.get_repo_path(), dirname, filename2)))
 		    except OSError as exc: # Guard against race condition
 		        if exc.errno != errno.EEXIST:
 		            raise
@@ -406,6 +446,9 @@ class BlobRawView(View):
 	def get(self, request, **kwargs):
 
 		filename = self.kwargs.get('filename')
+		directory = ""
+		if 'directories' in self.kwargs:
+			directory = self.kwargs.get('directories')
 		if self.kwargs.get('extension'):
 			filename += self.kwargs.get('extension')
 
@@ -426,9 +469,12 @@ class BlobRawView(View):
 			raise Http404("Failed to open repository")
 
 		try:
+			index_tree = repo.index
 			commit = repo.revparse_single('HEAD')
 			tree = commit.tree
-			blob_id = find_file_oid_in_tree(filename, tree)
+			item = tree.__getitem__(str(directory))
+			index_tree.read_tree(item.id)
+			blob_id = find_file_oid_in_tree_using_index(filename, index_tree)
 			if blob_id != 404:
 				return HttpResponse(repo[blob_id].data)
 			else:

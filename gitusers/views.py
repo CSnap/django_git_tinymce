@@ -526,3 +526,58 @@ class BlobDeleteView(DeleteView):
 			'gitusers:repo_detail',
 			args=(request.user.username, repo_obj.slug))
 		)
+
+class BlobDeleteFolderView(DeleteView):
+
+	template_name = 'repo/delete.html'
+	success_url = reverse_lazy('index')
+
+	def get(self, request, **kwargs):
+
+		filename = self.kwargs.get('filename')
+		directory = ""
+		if 'directories' in self.kwargs:
+			directory = self.kwargs['directories']
+
+		if self.kwargs.get('extension'):
+			filename += self.kwargs.get('extension')
+
+		repo_obj = None
+
+		try:
+			repo_obj = Repository.objects.get(
+				owner__username=self.kwargs.get('username'),
+				slug=self.kwargs['slug']
+			)
+			repo = pygit2.Repository(repo_obj.get_repo_path())
+
+			if repo.is_empty:
+				print('asdfasdfasdfasfd')
+				raise Http404("The repository is empty")
+
+		except:
+			raise Http404("Failed to open repository")
+
+		index_tree = repo.index
+		commit = repo.revparse_single('HEAD')
+		tree = commit.tree
+		print('str(directory)', str(directory))
+		item = tree.__getitem__(str(directory))
+		index_tree.read_tree(item.id)
+		blob_id = find_file_oid_in_tree_using_index(filename, index_tree)
+
+		#commit = repo.revparse_single('HEAD')
+		#tree = commit.tree
+		#blob_id = find_file_oid_in_tree(filename, tree)
+		file_name = str(filename)
+		print('file_name', file_name)
+		commit_message = str(filename) + ' deleted'
+		delete_commit(self.request.user, repo, commit_message, file_name)
+		try:
+			os.remove(os.path.join(repo.workdir, directory, file_name))
+		except OSError:
+			pass
+		return HttpResponseRedirect(reverse(
+			'gitusers:repo_detail',
+			args=(request.user.username, repo_obj.slug))
+		)

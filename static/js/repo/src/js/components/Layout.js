@@ -197,8 +197,9 @@ export default class Layout extends React.Component {
 
               {this.props.files.files.map((file) => {
                 const icon = this.getIcon(file.type)
-                const editLink = (files.is_owner) ? <a href={`blob/${file.name}/edit`} style={{fontSize: '.75em', color: '#999'}}>edit</a> : null
-                return <tr key={file.id}><th scope="row">{icon} <a href={`blob/${file.name}`}>{ file.name }</a> &nbsp;{editLink}</th><td>{ files.is_owner && <a href={`blob/${file.name}/delete`}><font style={{fontSize: '.75em', color: '#f33'}}>delete</font></a>}</td><td><a href={`commit/${file.id}`}>{file.id}</a></td></tr>
+                const editLink = (files.is_owner) ? (file.type == 'blob') ? <a href={`blob/${file.name}/edit`} style={{fontSize: '.75em', color: '#999'}}>edit</a>: null : null
+                const fileLink = (file.type == 'blob') ? <a href={`blob/${file.name}`}>{ file.name }</a> : <a href={`${file.name}`}>{ file.name }</a>
+                return <tr key={file.id}><th scope="row">{icon} {fileLink} &nbsp;{editLink}</th><td>{ files.is_owner && <a href={`blob/${file.name}/delete`}><font style={{fontSize: '.75em', color: '#f33'}}>delete</font></a>}</td><td><a href={`commit/${file.id}`}>{file.id}</a></td></tr>
               })}
               </tbody>
             </table>

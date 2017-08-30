@@ -14,7 +14,7 @@ from django.views.generic.edit import (
 from django.views.generic.list import ListView
 from django.urls import reverse, reverse_lazy
 
-from .utils import find_file_oid_in_tree, create_commit, delete_commit, find_file_oid_in_tree_using_index
+from .utils import find_file_oid_in_tree, create_commit, delete_commit, delete_commit_folders, find_file_oid_in_tree_using_index
 from django_git.mixins import OwnerRequiredMixin
 from repos.forms import (
 	RepositoryModelForm,
@@ -367,6 +367,7 @@ class RepositoryCreateFileView(OwnerRequiredMixin, FormView):
 			kwargs={
 				'username': self.request.user.username,
 				'slug': self.kwargs.get('slug')
+
 			}
 		)
 
@@ -472,8 +473,9 @@ class BlobRawView(View):
 			index_tree = repo.index
 			commit = repo.revparse_single('HEAD')
 			tree = commit.tree
-			item = tree.__getitem__(str(directory))
-			index_tree.read_tree(item.id)
+			if directory != "":
+				item = tree.__getitem__(str(directory))
+				index_tree.read_tree(item.id)
 			blob_id = find_file_oid_in_tree_using_index(filename, index_tree)
 			if blob_id != 404:
 				return HttpResponse(repo[blob_id].data)
@@ -562,17 +564,23 @@ class BlobDeleteFolderView(DeleteView):
 		commit = repo.revparse_single('HEAD')
 		tree = commit.tree
 		print('str(directory)', str(directory))
-		item = tree.__getitem__(str(directory))
-		index_tree.read_tree(item.id)
+		print('directory.split("/")', directory.split("/"))
+		folders = directory.split("/")
+		for folder in folders:
+			item = tree.__getitem__(str(folder))
+			index_tree.read_tree(item.id)
 		blob_id = find_file_oid_in_tree_using_index(filename, index_tree)
+		print('index_tree.__contains__(filename)', index_tree.__contains__(filename))
+		# index_tree.remove(str(filename))
+		# index_tree.write()
+		# for entry in index_tree:
+			# print('entry.path', entry.path)
 
-		#commit = repo.revparse_single('HEAD')
-		#tree = commit.tree
-		#blob_id = find_file_oid_in_tree(filename, tree)
+
 		file_name = str(filename)
 		print('file_name', file_name)
 		commit_message = str(filename) + ' deleted'
-		delete_commit(self.request.user, repo, commit_message, file_name)
+		delete_commit_folders(self.request.user, repo, commit_message, file_name, directory)
 		try:
 			os.remove(os.path.join(repo.workdir, directory, file_name))
 		except OSError:

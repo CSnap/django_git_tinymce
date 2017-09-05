@@ -160,10 +160,10 @@ export default class Layout extends React.Component {
         working_dir += folder
         let words = null
         if (i == last) {
-            words = <font>/ {folder} </font>
+            words = <font key={i}>/ {folder} </font>
         }
         else {
-            words = <font>/ <a href={`/${window.props.repo_owner}/${window.props.repo_name}/${working_dir}`}>{folder}</a> </font>
+            words = <font key={i}>/ <a href={`/${window.props.repo_owner}/${window.props.repo_name}/${working_dir}`}>{folder}</a> </font>
         }
         working_dir += "/"
         return words

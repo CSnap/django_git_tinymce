@@ -14,4 +14,4 @@ Pillow==5.0.0
 pycparser==2.18
 pygit2==0.26.3
 pytz==2018.3
-six==1.10.0
+six==1.11.0

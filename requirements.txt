@@ -3,7 +3,7 @@ cffi==1.11.4
 Django==2.0.2
 django-bootstrap3==9.1.0
 django-ckeditor==5.4.0
-django-cleanup==1.0.1
+django-cleanup==2.1.0
 django-crispy-forms==1.7.0
 django-filter==1.0.4
 django-tinymce4-lite==1.4.1

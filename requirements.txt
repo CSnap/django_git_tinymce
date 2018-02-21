@@ -1,5 +1,5 @@
 bleach==2.1.2
-cffi==1.9.1
+cffi==1.11.4
 Django==1.11.2
 django-bootstrap3==8.2.3
 django-ckeditor==5.3.1

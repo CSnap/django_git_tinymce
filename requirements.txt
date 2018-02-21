@@ -1,4 +1,4 @@
-bleach
+bleach==2.1.2
 cffi==1.9.1
 Django==1.11.2
 django-bootstrap3==8.2.3
